@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dự đoán Ung thư Cổ tử cung</title>
+    <link rel="stylesheet" href="/static/style.css">
+   
+</head>
+<body>
+<div class="container">
+    <h1>Dự đoán nguy cơ Ung thư Cổ tử cung</h1>
+    <form method="POST">
+        {% set binary_features = [
+            'Smokes', 'Hormonal Contraceptives', 'IUD', 'STDs',
+            'STDs:condylomatosis', 'STDs:cervical condylomatosis',
+            'STDs:vaginal condylomatosis', 'STDs:vulvo-perineal condylomatosis',
+            'STDs:syphilis', 'STDs:pelvic inflammatory disease',
+            'STDs:genital herpes', 'STDs:molluscum contagiosum',
+            'STDs:AIDS', 'STDs:HIV', 'STDs:Hepatitis B', 'STDs:HPV',
+            'Dx:Cancer', 'Dx:CIN', 'Dx:HPV', 'Dx',
+            'Hinselmann', 'Schiller', 'Citology'
+        ] %}
+        {% set label_mapping = {
+            'Age': 'Tuổi',
+            'Number of sexual partners': 'Số bạn tình',
+            'First sexual intercourse': 'Tuổi quan hệ lần đầu',
+            'Num of pregnancies': 'Số lần mang thai',
+            'Smokes': 'Có hút thuốc',
+            'Smokes (years)': 'Số năm hút thuốc',
+            'Smokes (packs/year)': 'Số gói mỗi năm',
+            'Hormonal Contraceptives': 'Dùng thuốc tránh thai',
+            'Hormonal Contraceptives (years)': 'Số năm dùng thuốc tránh thai',
+            'IUD': 'Đặt vòng',
+            'IUD (years)': 'Số năm đặt vòng',
+            'STDs': 'Từng mắc bệnh STDs',
+            'STDs (number)': 'Số lần mắc STDs',
+            'STDs:condylomatosis': 'Sùi mào gà',
+            'STDs:cervical condylomatosis': 'Sùi mào gà cổ tử cung',
+            'STDs:vaginal condylomatosis': 'Sùi mào gà âm đạo',
+            'STDs:vulvo-perineal condylomatosis': 'Sùi mào gà âm hộ - tầng sinh môn',
+            'STDs:syphilis': 'Bệnh giang mai',
+            'STDs:pelvic inflammatory disease': 'Viêm vùng chậu',
+            'STDs:genital herpes': 'Mụn rộp sinh dục',
+            'STDs:molluscum contagiosum': 'U mềm lây',
+            'STDs:AIDS': 'AIDS',
+            'STDs:HIV': 'HIV',
+            'STDs:Hepatitis B': 'Viêm gan B',
+            'STDs:HPV': 'Nhiễm HPV',
+            'STDs: Number of diagnosis': 'Số lần được chẩn đoán STDs',
+            'STDs: Time since first diagnosis': 'Thời gian từ lần chẩn đoán STDs đầu tiên',
+            'STDs: Time since last diagnosis': 'Thời gian từ lần chẩn đoán STDs gần nhất',
+            'Dx:Cancer': 'Từng được chẩn đoán ung thư',
+            'Dx:CIN': 'Từng được chẩn đoán CIN',
+            'Dx:HPV': 'Từng được chẩn đoán HPV',
+            'Dx': 'Từng có chẩn đoán bất thường',
+            'Hinselmann': 'Kết quả Hinselmann dương tính',
+            'Schiller': 'Kết quả Schiller dương tính',
+            'Citology': 'Kết quả tế bào học dương tính'
+        } %}
+
+        {% for name in features %}
+            <label>{{ label_mapping[name] }}</label>
+            {% if name in binary_features %}
+                <select name="{{ name }}" required>
+                    <option value="1">Có</option>
+                    <option value="0">Không</option>
+                </select>
+            {% else %}
+                <input type="number" step="any" name="{{ name }}" required>
+            {% endif %}
+        {% endfor %}
+
+        <button type="submit">Dự đoán</button>
+        <div class="sample-buttons">
+    <button type="button" onclick="fillLowRisk()">Mẫu Nguy cơ Thấp</button>
+    <button type="button" onclick="fillHighRisk()">Mẫu Nguy cơ Cao</button>
+</div>
+    </form>
+
+    {% if result is not none %}
+        <div class="result {{ 'danger' if result == 1 else 'success' }}">
+            <strong>
+                {{ "🔴 Nguy cơ cao mắc ung thư cổ tử cung!" if result == 1 else "🟢 Không có nguy cơ đáng kể." }}
+            </strong><br>
+            Xác suất mô hình dự đoán: <strong>{{ proba }}%</strong>
+        </div>
+    {% endif %}
+</div>
+<script>
+function fillLowRisk() {
+    const values = [
+        25, 1, 18, 0, 0, 0, 0,
+        1, 1, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0,
+        0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0
+    ];
+    fillForm(values);
+}
+
+function fillHighRisk() {
+    const values = [
+        42, 6, 15, 3, 1, 10, 5,
+        0, 0, 1, 5,
+        1, 2, 1, 1, 0, 0, 1, 1, 1,
+        0, 0, 1, 1, 1,
+        2, 6, 3,
+        1, 1, 1, 1,
+        1, 1, 1
+    ];
+    fillForm(values);
+}
+
+function fillForm(values) {
+    const inputs = document.querySelectorAll("form input, form select");
+    inputs.forEach((input, index) => {
+        if (input.type === "number") {
+            input.value = values[index];
+        } else if (input.tagName === "SELECT") {
+            input.value = values[index] === 1 ? "1" : "0";
+        }
+    });
+}
+</script>
+
+</body>
+</html>
