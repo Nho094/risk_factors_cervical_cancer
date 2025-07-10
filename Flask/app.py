@@ -85,8 +85,18 @@ def generate_advice_auto(name, value, shap_val, percent):
 def index():
     if request.method == "POST":
         try:
-            values = [float(request.form[f]) for f in feature_names]
+            values = []
+            for f in feature_names:
+                raw_val = request.form.get(f)
+                if raw_val is None or raw_val.strip() == "":
+                    val = np.nan  # Gán NaN nếu trống
+                else:
+                    val = float(raw_val)
+                values.append(val)
+
             X_input = pd.DataFrame([values], columns=feature_names)
+
+            
 
             prediction = model.predict(X_input)[0]
             proba = model.predict_proba(X_input)[0][1] * 100
@@ -101,7 +111,7 @@ def index():
             ]
 
             advice = ""
-            filtered = [x for x in impacts if x[2] >= 5]
+            filtered = [x for x in impacts if x[2] >= 20]
             if prediction == 1:
                 if filtered:
                     advice += "🧠 Các yếu tố ảnh hưởng lớn đến dự đoán:\n\n"

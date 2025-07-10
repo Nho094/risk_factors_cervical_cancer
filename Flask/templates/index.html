@@ -63,19 +63,20 @@
                 'Biopsy': 'Sinh thiết dương tính'
             } %}
 
-            {% for name in features %}
-            <div class="form-group">
-                <label>{{ label_mapping[name] }}</label>
-                {% if name in binary_features %}
-                    <select name="{{ name }}" required>
-                        <option value="0">Không</option>
-                        <option value="1">Có</option>
-                    </select>
-                {% else %}
-                    <input type="number" step="any" name="{{ name }}" required>
-                {% endif %}
-            </div>
-            {% endfor %}
+             {% for name in features %}
+        <div class="form-group">
+            <label>{{ label_mapping[name] }}</label>
+            {% if name in binary_features %}
+                <select name="{{ name }}">
+                    <option value="">--</option>
+                    <option value="0">Không</option>
+                    <option value="1">Có</option>
+                </select>
+            {% else %}
+                <input type="number" step="any" name="{{ name }}">
+            {% endif %}
+        </div>
+        {% endfor %}
         </div>
 
         <!-- Nút -->
