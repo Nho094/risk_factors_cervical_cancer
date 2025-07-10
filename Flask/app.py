@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import numpy as np
+from sklearn.impute import SimpleImputer
 import pandas as pd
 import joblib
 import shap
@@ -62,12 +63,16 @@ label_mapping = {
 
 
 model = joblib.load("logistic_model.pkl")
+imputer = joblib.load("imputer.pkl")
 X_background = shap.maskers.Independent(pd.DataFrame([[0]*len(feature_names)], columns=feature_names))
 explainer = shap.LinearExplainer(model, masker=X_background, feature_names=feature_names)
 
 
 def generate_advice_auto(name, value, shap_val, percent):
-    trend = "tăng nguy cơ" if shap_val > 0 else "giảm nguy cơ"
+    
+    if shap_val <= 0:
+        return ""  # Bỏ qua nếu đặc trưng làm giảm nguy cơ
+    trend = "tăng nguy cơ" 
     vi_name = label_mapping.get(name, name)
     line = f"• {vi_name} = {value} → {trend} ({shap_val:+.2f}, ảnh hưởng: {percent:.1f}%)\n"
 
@@ -81,46 +86,70 @@ def generate_advice_auto(name, value, shap_val, percent):
 
     return f"{line}  {desc}\n  👉 {action}\n"
 
-@app.route("/",methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         try:
-            values = []
-            for f in feature_names:
-                raw_val = request.form.get(f)
-                if raw_val is None or raw_val.strip() == "":
-                    val = np.nan  # Gán NaN nếu trống
-                else:
-                    val = float(raw_val)
-                values.append(val)
+            input_dict = dict.fromkeys(feature_names, np.nan)
 
-            X_input = pd.DataFrame([values], columns=feature_names)
+            # Ghi đè bằng các giá trị người dùng đã nhập
+            for name in feature_names:
+                raw_val = request.form.get(name)
+                try:
+                    input_dict[name] = float(raw_val)
+                except (TypeError, ValueError):
+                    pass  # giữ nguyên np.nan nếu không thể chuyển
 
+            # Kiểm tra: nếu mọi giá trị đều là NaN → trả lỗi nhẹ nhàng
+            if all(np.isnan(v) for v in input_dict.values()):
+                return "⚠️ Vui lòng nhập ít nhất một giá trị vào biểu mẫu."
+
+            # Dựng DataFrame với đủ cột
+            X_input = pd.DataFrame([input_dict], columns=feature_names)
+
+            # Kiểm tra số lượng cột có giá trị thực
+            valid_cols = X_input.notna().sum().sum()
+            if valid_cols == 0:
+                return "⚠️ Không thể xử lý vì tất cả các giá trị đều trống."
+
+            # Áp dụng Imputer nếu hợp lệ
             
+            X_input = pd.DataFrame(imputer.transform(X_input), columns=feature_names)
 
+
+            # Bước 3: Dự đoán
             prediction = model.predict(X_input)[0]
             proba = model.predict_proba(X_input)[0][1] * 100
 
-            # SHAP
+            # Bước 4: SHAP
             shap_values = explainer(X_input)
             shap_score = shap_values.values[0]
             total_abs = sum(abs(val) for val in shap_score)
+
             impacts = [
                 (feature_names[i], shap_score[i], abs(shap_score[i]) / total_abs * 100)
                 for i in range(len(feature_names))
             ]
+            impacts_sorted = sorted(impacts, key=lambda x: abs(x[1]), reverse=True)
+            filtered = [x for x in impacts_sorted if x[2] >= 5]
+            if not filtered:
+                filtered = impacts_sorted[:3]
 
-            advice = ""
-            filtered = [x for x in impacts if x[2] >= 20]
+            # Bước 5: Sinh lời khuyên
             if prediction == 1:
-                if filtered:
-                    advice += "🧠 Các yếu tố ảnh hưởng lớn đến dự đoán:\n\n"
-                    for name, shap_val, percent in filtered:
-                        idx = feature_names.index(name)
-                        val = values[idx]
-                        advice += generate_advice_auto(name, val, shap_val, percent)
-                else:
-                    advice = "⚠️ Nguy cơ cao nhưng không có yếu tố nào vượt ngưỡng 10% ảnh hưởng."
+                advice = "🧠 Các yếu tố ảnh hưởng lớn đến dự đoán:\n\n"
+
+                has_high_impact = any(pct > 25 for _, _, pct in filtered)
+
+                for name, shap_val, percent in filtered:
+                    val = X_input.iloc[0][name]
+                    advice += generate_advice_auto(name, val, shap_val, percent)
+
+                if has_high_impact:
+                    advice = (
+                        "⚠️ Một số yếu tố có ảnh hưởng rất lớn đến kết quả (trên 25%). "
+                        "Bạn nên tham khảo ý kiến bác sĩ sớm.\n\n"
+                    ) + advice
             else:
                 advice = (
                     "✅ Bạn hiện không có nguy cơ đáng kể.\n\n"
@@ -130,16 +159,19 @@ def index():
                     "• Tránh hút thuốc, hạn chế rượu bia\n"
                     "• Nếu chưa tiêm vaccine HPV, nên tham khảo ý kiến bác sĩ về việc tiêm phòng\n"
                     "\nChúc bạn luôn khỏe mạnh ❤️"
-                )  
-            # # Lưu biểu đồ waterfall SHAP
-            # plt.figure()
-            # shap.plots.waterfall(shap_values[0], show=False)
-            # plt.savefig("static/shap_plot.png", bbox_inches='tight')
-            # plt.close()
+                )
+
+            # Bước 6: SHAP plot
+            plt.figure()
+            shap.plots.waterfall(shap_values[0], show=False)
+            plt.savefig("static/shap_plot.png", bbox_inches='tight')
+            plt.close()
 
             return render_template("index.html", features=feature_names,
                                    result=prediction, proba=round(proba, 2),
                                    advice=advice)
+
+
         except Exception as e:
             return f"Lỗi xử lý dữ liệu: {e}"
     return render_template("index.html", features=feature_names, result=None)

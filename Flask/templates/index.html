@@ -223,7 +223,7 @@
             <h2>Kết quả dự đoán</h2>
             <div id="modalResultText"></div>
             <div id="modalAdviceBox" class="advice-box"></div>
-            <!-- <img id="modalShapImage" src="" width="600px"> -->
+            <img id="modalShapImage" src="" width="600px">
         </div>
     </div>
     {% if result is not none %}
@@ -234,11 +234,11 @@
             <p>Xác suất mô hình dự đoán: <strong>{{ proba }}%</strong></p>
         `;
             const adviceText = `{{ advice | safe }}`;
-            // const shapPath = "{{ url_for('static', filename='shap_plot.png') }}";
+            const shapPath = "{{ url_for('static', filename='shap_plot.png') }}";
 
             document.getElementById("modalResultText").innerHTML = resultText;
             document.getElementById("modalAdviceBox").innerHTML = adviceText;
-            // document.getElementById("modalShapImage").src = shapPath;
+             document.getElementById("modalShapImage").src = shapPath;
 
             // Mở modal
             document.getElementById("resultModal").style.display = "block";
@@ -247,19 +247,22 @@
     {% endif %}
 
     <script>
-        function handleDependency(parentName) {
-            const parentSelect = document.querySelector(`[name="${parentName}"]`);
-            const value = parentSelect.value;
+       function handleDependency(parentName) {
+    const parentSelect = document.querySelector(`[name="${parentName}"]`);
+    const value = parentSelect.value;
 
-            const children = document.querySelectorAll(`.dependent-field.${parentName}-child`);
-            children.forEach(child => {
-                if (value === "1") {
-                    child.classList.remove("hidden");
-                } else {
-                    child.classList.add("hidden");
-                }
-            });
+    const children = document.querySelectorAll(`.dependent-field.${parentName}-child`);
+    children.forEach(child => {
+        const input = child.querySelector("input");
+        if (value === "1") {
+            child.classList.remove("hidden");
+        } else {
+            child.classList.add("hidden");
+            if (input) input.value = ""; // ✅ Xoá giá trị nếu ẩn
         }
+    });
+}
+
 
         document.addEventListener("DOMContentLoaded", function () {
             // Kích hoạt trạng thái phụ thuộc khi load lại
