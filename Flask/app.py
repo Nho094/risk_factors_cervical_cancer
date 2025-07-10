@@ -120,9 +120,7 @@ def index():
                     "• Tránh hút thuốc, hạn chế rượu bia\n"
                     "• Nếu chưa tiêm vaccine HPV, nên tham khảo ý kiến bác sĩ về việc tiêm phòng\n"
                     "\nChúc bạn luôn khỏe mạnh ❤️"
-                )
-
-           
+                )  
             # Lưu biểu đồ waterfall SHAP
             plt.figure()
             shap.plots.waterfall(shap_values[0], show=False)
