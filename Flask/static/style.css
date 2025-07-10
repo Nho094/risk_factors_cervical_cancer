@@ -196,43 +196,6 @@ td:nth-child(2):has(:contains("Âm tính")) {
 }
 
 /* Responsive bảng */
-@media (max-width: 768px) {
-    table, thead, tbody, th, td, tr {
-        display: block;
-    }
-
-    th {
-        display: none;
-    }
-
-    tr {
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        overflow: hidden;
-        background: #fff;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    td {
-        position: relative;
-        padding-left: 50%;
-        border: none;
-        border-bottom: 1px solid #eee;
-    }
-
-    td::before {
-        position: absolute;
-        top: 12px;
-        left: 16px;
-        width: 45%;
-        white-space: nowrap;
-        font-weight: bold;
-        color: #555;
-    }
-
-    td:nth-of-type(1)::before { content: "Thời gian"; }
-    td:nth-of-type(2)::before { content: "Kết quả"; }
-    td:nth-of-type(3)::before { content: "Xác suất (%)"; }
-    td:nth-of-type(4)::before { content: "Dữ liệu đầu vào"; }
+.hidden {
+    display: none !important;
 }

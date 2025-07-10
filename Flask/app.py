@@ -131,11 +131,11 @@ def index():
                     "• Nếu chưa tiêm vaccine HPV, nên tham khảo ý kiến bác sĩ về việc tiêm phòng\n"
                     "\nChúc bạn luôn khỏe mạnh ❤️"
                 )  
-            # Lưu biểu đồ waterfall SHAP
-            plt.figure()
-            shap.plots.waterfall(shap_values[0], show=False)
-            plt.savefig("static/shap_plot.png", bbox_inches='tight')
-            plt.close()
+            # # Lưu biểu đồ waterfall SHAP
+            # plt.figure()
+            # shap.plots.waterfall(shap_values[0], show=False)
+            # plt.savefig("static/shap_plot.png", bbox_inches='tight')
+            # plt.close()
 
             return render_template("index.html", features=feature_names,
                                    result=prediction, proba=round(proba, 2),
