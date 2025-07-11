@@ -1,10 +1,20 @@
-/* Căn bản cho toàn trang */
 body {
     font-family: 'Segoe UI', sans-serif;
-    background-color: #f0f2f5;
+    background: url('./images/AdobeStock_412295922_Preview.jpeg') no-repeat center center fixed;
+    background-size: cover;
     color: #333;
     padding: 30px;
 }
+
+
+.overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(255,255,255,0.6); /* lớp trắng mờ 60% */
+    z-index: -1;
+}
+
 
 /* Container chính */
 .container {
@@ -198,4 +208,118 @@ td:nth-child(2):has(:contains("Âm tính")) {
 /* Responsive bảng */
 .hidden {
     display: none !important;
+}
+
+#chatButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+#chatbox {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 50vh;                /* To hơn một chút */
+    height: 50vh;                /* 50% chiều cao màn hình */
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    max-height: 80vh;
+}
+
+.hidden {
+    display: none;
+}
+
+.chat-header {
+    background: #007bff;
+    color: white;
+    padding: 10px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+
+
+.chat-input-area {
+    display: flex;
+    padding: 8px;
+    border-top: 1px solid #ccc;
+}
+
+
+
+
+.chat-log {
+     padding: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+    font-size: 20px;
+    line-height: 2.0;
+}
+
+.chat-input-area input {
+    font-size: 20px;
+    flex-grow: 1;
+    padding: 6px;
+    margin-right: 5px;
+}
+
+.chat-input-area button {
+     padding: 6px 10px;
+    font-size: 20px;
+}
+.user-message {
+    margin-bottom: 5px;
+    text-align: right;
+    color: #333;
+}
+
+.ai-message {
+    margin-bottom: 8px;
+    text-align: left;
+    color: #007bff;
+    background: #f1f9ff;
+    padding: 10px;
+    border-radius: 8px;
+    line-height: 2.0;
+    white-space: pre-line; /* giữ dòng xuống đúng */
+    font-size: 20px;
+}
+
+.ai-message strong {
+    color: #0056b3;
+}
+
+.ai-message ul, .ai-message ol {
+    padding-left: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.ai-message li {
+    margin-bottom: 4px;
+}
+
+.ai-message em {
+    color: #555;
 }

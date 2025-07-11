@@ -6,6 +6,46 @@ import joblib
 import shap
 import matplotlib.pyplot as plt
 import os
+import requests
+import json
+from dotenv import load_dotenv
+load_dotenv()
+
+api_key = os.getenv("OPENROUTER_API_KEY")
+
+def ask_openrouter(prompt):
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://yourdomain.com",
+        "X-Title": "CervicalCancerPredictor"
+    }
+
+    data = {
+        # "model": "google/gemini-flash-2.5",
+        #   "model":"cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+           "model":"google/gemma-3n-e2b-it:free",
+        # "model": "deepseek/deepseek-r1-0528:free",
+
+
+
+
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    }
+
+    response = requests.post(url=url, headers=headers, data=json.dumps(data))
+    
+    if response.status_code == 200:
+        return response.json()["choices"][0]["message"]["content"]
+    else:
+        return f"Lỗi từ OpenRouter: {response.status_code} - {response.text}"
+
 
 from feature_advice import feature_advice  # Load mô tả
 
@@ -171,6 +211,7 @@ def index():
                     "\nChúc bạn luôn khỏe mạnh ❤️"
                 )
 
+            extra_insight = ask_openrouter(f"Hãy đưa ra phân tích y khoa bằng tiếng Việt dựa trên lời khuyên sau:\n{advice}")
 
             # Bước 6: SHAP plot
             plt.figure()
@@ -180,11 +221,24 @@ def index():
 
             return render_template("index.html", features=feature_names,
                                    result=prediction, proba=round(proba, 2),
-                                   advice=advice)
+                                   advice=advice, extra_insight=extra_insight)
 
 
         except Exception as e:
             return f"Lỗi xử lý dữ liệu: {e}"
     return render_template("index.html", features=feature_names, result=None)
+from flask import jsonify  # Nếu chưa có thì thêm
+
+@app.route("/ask", methods=["POST"])
+def ask():
+    try:
+        data = request.get_json()
+        prompt = data.get("prompt", "")
+        if not prompt.strip():
+            return jsonify({"reply": "⚠️ Không nhận được câu hỏi hợp lệ."})
+        reply = ask_openrouter(prompt)
+        return jsonify({"reply": reply})
+    except Exception as e:
+        return jsonify({"reply": f"Lỗi: {e}"})
 if __name__ == "__main__":
     app.run(debug=True)
