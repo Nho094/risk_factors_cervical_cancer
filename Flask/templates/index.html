@@ -230,7 +230,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const resultText = `
-            <p><strong>{{ "🔴 Nguy cơ cao mắc ung thư cổ tử cung!" if result == 1 else "🟢 Không có nguy cơ đáng kể." }}</strong></p>
+            <p><strong>{{ "🔴 Nguy cơ cao mắc ung thư cổ tử cung!" if proba >=25 else "🟢 Không có nguy cơ đáng kể." }}</strong></p>
             <p>Xác suất mô hình dự đoán: <strong>{{ proba }}%</strong></p>
         `;
             const adviceText = `{{ advice | safe }}`;
