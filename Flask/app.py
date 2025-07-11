@@ -136,8 +136,8 @@ def index():
                 filtered = impacts_sorted[:3]
 
             # Bước 5: Sinh lời khuyên
-            if prediction == 1:
-                advice = "🧠 Các yếu tố ảnh hưởng lớn đến dự đoán:\n\n"
+            if proba >= 25:
+                advice = "🔴 CẢNH BÁO: Có nguy cơ tiềm ẩn.\n\n"
 
                 has_high_impact = any(pct > 25 for _, _, pct in filtered)
 
@@ -150,6 +150,16 @@ def index():
                         "⚠️ Một số yếu tố có ảnh hưởng rất lớn đến kết quả (trên 25%). "
                         "Bạn nên tham khảo ý kiến bác sĩ sớm.\n\n"
                     ) + advice
+
+                advice += (
+                    "\n💡 Khuyến nghị:\n"
+                    "• Tham khảo ý kiến bác sĩ chuyên khoa\n"
+                    "• Tiến hành xét nghiệm Pap smear hoặc HPV nếu chưa làm\n"
+                    "• Duy trì lối sống lành mạnh, ăn uống khoa học\n"
+                    "• Tuyệt đối tránh thuốc lá, hạn chế rượu bia\n"
+                    "• Tiêm vaccine HPV nếu chưa tiêm\n"
+                    "\nSức khỏe của bạn là điều quan trọng nhất. Hãy hành động ngay hôm nay! ❤️"
+                )
             else:
                 advice = (
                     "✅ Bạn hiện không có nguy cơ đáng kể.\n\n"
@@ -160,6 +170,7 @@ def index():
                     "• Nếu chưa tiêm vaccine HPV, nên tham khảo ý kiến bác sĩ về việc tiêm phòng\n"
                     "\nChúc bạn luôn khỏe mạnh ❤️"
                 )
+
 
             # Bước 6: SHAP plot
             plt.figure()
