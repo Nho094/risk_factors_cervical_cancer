@@ -104,3 +104,45 @@
     height: 60px;
     object-fit: contain;
 }
+
+footer {
+  position: relative;
+  width: 100vw;
+  left: 0;
+  background: linear-gradient(to right, #182a60, #344a9f);
+  color: white;
+  padding: 15px 0;
+  text-align: center;
+  font-size: 16px;
+  margin-top: 20px;
+  margin-bottom: 0; /* bỏ khoảng cách dưới */
+  box-sizing: border-box;
+  z-index: 10;
+  margin-left: calc(-50vw + 50%);
+}
+
+
+
+
+/* Icon trong footer */
+footer .iconfoot {
+    color: #ed4190;  /* Hồng nổi bật */
+    font-size: 20px;
+    margin: 0 10px;
+    transition: transform 0.2s ease;
+}
+
+footer .iconfoot:hover {
+    transform: scale(1.2); /* Hiệu ứng phóng khi hover */
+}
+
+/* Liên kết */
+footer a {
+    color: white;
+    text-decoration: none;
+}
+
+/* Tổ chức các icon */
+.social-icons {
+    margin: 10px 0;
+}
