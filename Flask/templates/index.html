@@ -13,36 +13,52 @@
 </head>
 
 <body>
-  <header class="header">
+<header class="header">
   <div class="grid">
     <nav class="header__navbar">
-      <!-- Nhóm trái: logo + lịch sử + kết nối -->
+      <!-- Nhóm trái: logo + menu -->
       <div class="header__navbar-left">
         <a href="/" class="header__logo">
           <img src="/static/images/depositphotos_89720090-stock-illustration-breast-cancer-awareness-removebg-preview.png" alt="Logo" class="header__logo-img">
         </a>
+
         <ul class="header__navbar-list">
-          <li class="header__navbar-item header__navbar-item--doc">Xem lịch sử dự đoán</li>
-          <li class="header__navbar-item">
-            <a href="https://bvubct.vn/" class="header__navbar-item-link"><i class="fa-solid fa-link"></i> Kết nối</a>
+          <li class="header__navbar-item header__navbar-item--doc">
+            <a href="/history" class="header__navbar-item-link">
+              <i class="fa-solid fa-clock-rotate-left"></i> Xem lịch sử dự đoán
+            </a>
           </li>
-          <li class="header__navbar-item header__navbar-item--doc"><i class="fa-solid fa-user-doctor"></i> Theo dõi Sức khỏe</li>
+
+          <li class="header__navbar-item header__navbar-item--doc">
+            <a href="https://bvubct.vn/" class="header__navbar-item-link">
+              <i class="fa-solid fa-link"></i> Kết nối
+            </a>
+          </li>
+
+          <li class="header__navbar-item">
+            <a href="/monitor" class="header__navbar-item-link">
+                <i class="fa-solid fa-user-doctor"></i> Theo dõi Sức khỏe
+            </a>
+
+          </li>
         </ul>
       </div>
 
-      <!-- Nhóm phải: trợ giúp, đăng ký, đăng nhập -->
+      <!-- Nhóm phải -->
       <ul class="header__navbar-list">
         <li class="header__navbar-item">
-          <a href="#!" class="header__navbar-item-link" onclick="openChatbox()"> 
+          <a href="#!" class="header__navbar-item-link" onclick="openChatbox()">
             <i class="fa-solid fa-circle-question"></i> Trợ giúp
           </a>
         </li>
+
         <li class="header__navbar-item header__navbar-item--doc header__navbar-item--strong">Đăng ký</li>
         <li class="header__navbar-item header__navbar-item--strong">Đăng nhập</li>
       </ul>
     </nav>
   </div>
 </header>
+
 
 
     <div class = "overlay"> </div>

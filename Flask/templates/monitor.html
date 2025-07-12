@@ -1,0 +1,71 @@
+<!-- <!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Theo dõi sức khỏe</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8f8fb;
+      padding: 40px;
+      margin: 0;
+    }
+
+    .chart-container {
+      width: 80%;
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chart-container">
+    <h2>Biểu đồ theo dõi nguy cơ Ung thư Cổ tử cung</h2>
+    <canvas id="riskChart" height="100"></canvas>
+  </div>
+
+  <script>
+    const chartLabels = {{ labels | tojson | safe }};
+    const chartData = {{ probabilities | tojson | safe }};
+
+    const ctx = document.getElementById("riskChart").getContext("2d");
+    const chart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: chartLabels,
+        datasets: [{
+          label: "Nguy cơ (%)",
+          data: chartData,
+          backgroundColor: function(context) {
+            const value = context.raw;
+            return value >= 25 ? '#ff4d4f' : '#2f80ed';
+          }
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: "Xác suất dự đoán (%)"
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html> -->

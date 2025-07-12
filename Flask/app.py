@@ -256,6 +256,14 @@ def history():
     history_data = session.get("history", [])
     return render_template("history.html", history=history_data, label_mapping=label_mapping)
 
-    
+
+
+@app.route("/monitor")
+def monitor():
+    # Dữ liệu giả để test biểu đồ
+    labels = ["Lần 1", "Lần 2", "Lần 3", "Lần 4"]
+    probabilities = [18.5, 42.3, 26.7, 12.9]
+
+    return render_template("monitor.html", labels=labels, probabilities=probabilities) 
 if __name__ == "__main__":
     app.run(debug=True)
