@@ -26,10 +26,10 @@ def ask_openrouter(prompt):
         # "model": "google/gemini-flash-2.5",
         #   "model":"cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
         #    "model":"google/gemma-3n-e2b-it:free",
-           "model":"cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-        # "model": "deepseek/deepseek-r1-0528:free",
+        #    "model":"cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+        # "model": "tngtech/deepseek-r1t2-chimera:free",
 
-
+          "model":"openrouter/cypher-alpha:free",
 
 
         "messages": [
