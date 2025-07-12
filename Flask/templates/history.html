@@ -1,12 +1,11 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Lịch sử Dự đoán</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <div class="container">
+
+    
+{% extends "template.html" %}
+
+{% block title %}Dự đoán Ung thư Cổ tử cung{% endblock %}
+
+{% block content %}
+<div class="container">
         <h1>Lịch sử Dự đoán Ung thư Cổ tử cung</h1>
         <a href="/">← Quay lại</a>
         {% if history %}
@@ -45,5 +44,5 @@
         <p>Chưa có dự đoán nào được lưu.</p>
         {% endif %}
     </div>
-</body>
-</html>
+
+{% endblock %}
