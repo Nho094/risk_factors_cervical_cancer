@@ -105,44 +105,47 @@
     object-fit: contain;
 }
 
-footer {
-  position: relative;
-  width: 100vw;
-  left: 0;
-  background: linear-gradient(to right, #182a60, #344a9f);
-  color: white;
-  padding: 15px 0;
-  text-align: center;
-  font-size: 16px;
-  margin-top: 20px;
-  margin-bottom: 0; /* bỏ khoảng cách dưới */
-  box-sizing: border-box;
-  z-index: 10;
-  margin-left: calc(-50vw + 50%);
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Phần nội dung chính */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 
+/* Footer styling giữ nguyên hoặc điều chỉnh lại */
+footer {
+    background-color: #002f6c;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 16px;
+}
 
-
-/* Icon trong footer */
 footer .iconfoot {
-    color: #ed4190;  /* Hồng nổi bật */
+    color: #ed4190;
     font-size: 20px;
     margin: 0 10px;
     transition: transform 0.2s ease;
 }
 
 footer .iconfoot:hover {
-    transform: scale(1.2); /* Hiệu ứng phóng khi hover */
+    transform: scale(1.2);
 }
 
-/* Liên kết */
 footer a {
     color: white;
     text-decoration: none;
 }
 
-/* Tổ chức các icon */
 .social-icons {
     margin: 10px 0;
 }
