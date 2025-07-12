@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify, session
 import numpy as np
 from sklearn.impute import SimpleImputer
 import pandas as pd
@@ -51,6 +51,7 @@ def ask_openrouter(prompt):
 from feature_advice import feature_advice  # Load mô tả
 
 app = Flask(__name__)
+app.secret_key = "super-secret-key" 
 
 feature_names = ['Age', 'Number of sexual partners', 'First sexual intercourse',
     'Num of pregnancies', 'Smokes', 'Smokes (years)', 'Smokes (packs/year)',
@@ -219,7 +220,16 @@ def index():
             shap.plots.waterfall(shap_values[0], show=False)
             plt.savefig("static/shap_plot.png", bbox_inches='tight')
             plt.close()
+            if "history" not in session:
+                session["history"] = []
 
+            session["history"].append({
+                "input": {k: request.form.get(k) for k in feature_names},
+                "result": int(prediction),
+                "proba": round(proba, 2),
+                "advice": advice
+            })
+            session.modified = True
             return render_template("index.html", features=feature_names,
                                    result=prediction, proba=round(proba, 2),
                                    advice=advice, extra_insight=extra_insight)
@@ -241,5 +251,11 @@ def ask():
         return jsonify({"reply": reply})
     except Exception as e:
         return jsonify({"reply": f"Lỗi: {e}"})
+@app.route("/history")
+def history():
+    history_data = session.get("history", [])
+    return render_template("history.html", history=history_data, label_mapping=label_mapping)
+
+    
 if __name__ == "__main__":
     app.run(debug=True)
