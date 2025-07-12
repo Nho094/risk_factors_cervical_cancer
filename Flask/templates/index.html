@@ -4,27 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <title>Dự đoán Ung thư Cổ tử cung</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet" href="./https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="/static/private.css">
 </head>
 
 <body>
-    <header class = "header">
-        <nav class="header__navbar">
-            <ul class="header__navbar-list">
-                <li class="header__navbar-item">Xem lịch sử dự đoán</li>
-                <li class="header__vaber-item">Kết nối</li>
+  <header class="header">
+  <div class="grid">
+    <nav class="header__navbar">
+      <!-- Nhóm trái: logo + lịch sử + kết nối -->
+      <div class="header__navbar-left">
+        <a href="/" class="header__logo">
+          <img src="/static/images/depositphotos_89720090-stock-illustration-breast-cancer-awareness-removebg-preview.png" alt="Logo" class="header__logo-img">
+        </a>
+        <ul class="header__navbar-list">
+          <li class="header__navbar-item header__navbar-item--doc">Xem lịch sử dự đoán</li>
+          <li class="header__navbar-item">
+            <a href="https://bvubct.vn/" class="header__navbar-item-link"><i class="fa-solid fa-link"></i> Kết nối</a>
+          </li>
+          <li class="header__navbar-item header__navbar-item--doc"><i class="fa-solid fa-user-doctor"></i> Theo dõi Sức khỏe</li>
+        </ul>
+      </div>
 
-            </ul>
-            <ul class="header__navbar-list">
-                <li class="header__navbar-item">
-                    <a href="" class="header__navbar-item-link">Trợ giúp</a>
-                </li>
-                <li class="header__navbar-item">Đăng ký</li>
-                <li class="header__navbar-item">Đăng nhập</li>
-            </ul>
-        </nav>
-    </header>
+      <!-- Nhóm phải: trợ giúp, đăng ký, đăng nhập -->
+      <ul class="header__navbar-list">
+        <li class="header__navbar-item">
+          <a href="#!" class="header__navbar-item-link" onclick="openChatbox()"> 
+            <i class="fa-solid fa-circle-question"></i> Trợ giúp
+          </a>
+        </li>
+        <li class="header__navbar-item header__navbar-item--doc header__navbar-item--strong">Đăng ký</li>
+        <li class="header__navbar-item header__navbar-item--strong">Đăng nhập</li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
     <div class = "overlay"> </div>
     <div class="container">
         <h1>Dự đoán nguy cơ Ung thư Cổ tử cung</h1>
@@ -336,6 +356,19 @@
             chatLog.innerHTML += `<div class="ai-message"><em>Lỗi phản hồi từ AI.</em></div>`;
         }
     }
+</script>
+<script>
+    function openChatbox() {
+        const chatbox = document.getElementById("chatbox");
+        chatbox.classList.remove("hidden");
+        chatbox.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function toggleChatbox() {
+        document.getElementById("chatbox").classList.toggle("hidden");
+    }
+
+    // sendMessage() bạn đã có ở trên
 </script>
 
 </body>

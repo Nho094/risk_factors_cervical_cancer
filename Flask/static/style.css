@@ -1,9 +1,11 @@
+
 body {
     font-family: 'Segoe UI', sans-serif;
     background: url('./images/AdobeStock_412295922_Preview.jpeg') no-repeat center center fixed;
     background-size: cover;
     color: #333;
-    padding: 30px;
+    padding: 0px;
+    margin:0px;
 }
 
 
