@@ -10,6 +10,30 @@ import os
 import requests
 import json
 from dotenv import load_dotenv
+import threading  # 👈 THÊM ở đầu file (nếu chưa có)
+
+# ... các import khác như os, json, pandas...
+
+# ✅ Khai báo lock dùng cho thread-safe file write
+save_lock = threading.Lock()
+
+# ✅ Hàm lưu lịch sử có khóa an toàn
+def save_history_to_file(record):
+    filename = "history_data.json"
+    with save_lock:
+        if os.path.exists(filename):
+            with open(filename, "r") as f:
+                try:
+                    data = json.load(f)
+                except json.JSONDecodeError:
+                    data = []
+        else:
+            data = []
+
+        data.append(record)
+
+        with open(filename, "w") as f:
+            json.dump(data, f, indent=2)
 
 load_dotenv()
 
@@ -130,6 +154,8 @@ def generate_advice_auto(name, value, shap_val, percent):
 
     return f"{line}  {desc}\n  👉 {action}\n"
 
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -223,21 +249,27 @@ def index():
             shap.plots.waterfall(shap_values[0], show=False)  # sử dụng matplotlib backend
             plt.savefig("static/shap_plot.png", bbox_inches='tight')
             plt.close()
-            if "history" not in session:
-                session["history"] = []
-
-            session["history"].append({
+            record = {
                 "input": {k: request.form.get(k) for k in feature_names},
                 "result": int(prediction),
                 "proba": round(proba, 2),
                 "advice": advice,
                 "timestamp": datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
-            })
+            }
 
+            # Lưu tạm vào session (cho biểu đồ hoặc hiển thị lần này)
+            if "history" not in session:
+                session["history"] = []
+            session["history"].append(record)
             session.modified = True
+
+            # Lưu vĩnh viễn vào file JSON
+            save_history_to_file(record)
+
             return render_template("index.html", features=feature_names,
-                                   result=prediction, proba=round(proba, 2),
-                                   advice=advice, extra_insight=extra_insight)
+                                result=prediction, proba=round(proba, 2),
+                                advice=advice, extra_insight=extra_insight)
+
 
 
         except Exception as e:
@@ -262,15 +294,20 @@ def ask():
 
 @app.route("/monitor")
 def monitor():
-    predictions = session.get("history", [])
+    try:
+        with open("history_data.json", "r") as f:
+            predictions = json.load(f)
+    except FileNotFoundError:
+        predictions = []
+
     labels = [f"Lần {i+1}" for i in range(len(predictions))]
     probabilities = [p.get("proba", 0) for p in predictions]
 
-    # ✅ Truyền thêm timestamp và proba đầy đủ sang template
     return render_template("monitor.html",
                            labels=labels,
                            probabilities=probabilities,
                            history=predictions)
+
 
 
 
@@ -281,14 +318,27 @@ def predict():
 
 @app.route('/history')
 def history():
-    history = session.get("history", [])
+    try:
+        with open("history_data.json", "r") as f:
+            history = json.load(f)
+    except FileNotFoundError:
+        history = []
+
     return render_template("history.html", history=history, label_mapping=label_mapping)
+
 
 
 @app.route("/clear_history")
 def clear_history():
-    session.pop("history", None)  # Xoá lịch sử người dùng hiện tại (trong session)
+    # Xoá session
+    session.pop("history", None)
+
+    # Xoá file JSON nếu tồn tại
+    if os.path.exists("history_data.json"):
+        os.remove("history_data.json")
+
     return redirect(url_for("monitor"))
+
 
 
 if __name__ == "__main__":
