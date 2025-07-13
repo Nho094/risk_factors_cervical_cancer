@@ -220,8 +220,9 @@ def index():
             extra_insight = ask_openrouter(f"Hãy đưa ra phân tích y khoa bằng tiếng Việt dựa trên lời khuyên sau:\n{advice}")
 
             # Bước 6: SHAP plot
+            
             plt.figure()
-            shap.plots.waterfall(shap_values[0], show=False)
+            shap.plots.waterfall(shap_values[0], show=False)  # sử dụng matplotlib backend
             plt.savefig("static/shap_plot.png", bbox_inches='tight')
             plt.close()
             if "history" not in session:
