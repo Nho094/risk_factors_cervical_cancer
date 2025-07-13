@@ -7,6 +7,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Dự đoán Ung thư Cổ tử cung</title>
+    <!-- Gợi ý: Dùng Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -17,52 +20,56 @@
     <!-- Toàn bộ phần nội dung bạn dán ở trên được giữ nguyên từ đây... -->
     
     <div class="wrapper">
-        <header class="header">
-  <div class="grid">
-    <nav class="header__navbar">
-      <!-- Nhóm trái: logo + menu -->
-      <div class="header__navbar-left">
-        <a href="/" class="header__logo">
-          <img src="/static/images/depositphotos_89720090-stock-illustration-breast-cancer-awareness-removebg-preview.png" alt="Logo" class="header__logo-img">
-        </a>
+      <header class="header">
+    <div class="grid">
+      <nav class="header__navbar">
+        <!-- Nhóm trái: logo + menu -->
+        <div class="header__navbar-left">
+          <a href="/" class="header__logo">
+            <img src="/static/images/depositphotos_89720090-stock-illustration-breast-cancer-awareness-removebg-preview.png" alt="Logo" class="header__logo-img">
+          </a>
 
-        <ul class="header__navbar-list">
-          <li class="header__navbar-item header__navbar-item--doc">
-            <a href="/history" class="header__navbar-item-link">
-              <i class="fa-solid fa-clock-rotate-left"></i> Xem lịch sử dự đoán
-            </a>
-          </li>
+          <ul class="header__navbar-list">
+            <li class="header__navbar-item header__navbar-item--doc">
+              <a href="/history" class="header__navbar-item-link">
+                <i class="fa-solid fa-clock-rotate-left"></i> Xem lịch sử dự đoán
+              </a>
+            </li>
 
-          <li class="header__navbar-item header__navbar-item--doc">
-            <a href="https://bvubct.vn/" class="header__navbar-item-link">
-              <i class="fa-solid fa-link"></i> Kết nối
-            </a>
-          </li>
+            <li class="header__navbar-item header__navbar-item--doc">
+              <a href="https://bvubct.vn/" class="header__navbar-item-link">
+                <i class="fa-solid fa-link"></i> Kết nối
+              </a>
+            </li>
 
-          <li class="header__navbar-item">
-            <a href="/monitor" class="header__navbar-item-link">
+            <li class="header__navbar-item">
+              <a href="/monitor" class="header__navbar-item-link">
                 <i class="fa-solid fa-user-doctor"></i> Theo dõi Sức khỏe
-            </a>
+              </a>
+            </li>
+          </ul>
+        </div>
 
+        <!-- Nhóm giữa -->
+        <div class="header__navbar-center">
+          <h1 class="header__slogan">Vì một tương lai không còn ung thư cổ tử cung.</h1>
+        </div>
+
+        <!-- Nhóm phải -->
+       <!-- Nhóm phải -->
+        <div class="header__navbar-right">
+        <ul class="header__navbar-list">
+            <li class="header__navbar-item">
+            <a href="#" class="header__navbar-item-link" onclick="openChatbox()">
+                <i class="fa-solid fa-circle-question"></i> Trợ giúp
+            </a>
           </li>
         </ul>
-      </div>
+        </div>
 
-      
-      <!-- Nhóm phải -->
-      <ul class="header__navbar-list">
-        <li class="header__navbar-item">
-          <a href="#!" class="header__navbar-item-link" onclick="openChatbox()">
-            <i class="fa-solid fa-circle-question"></i> Trợ giúp
-          </a>
-        </li>
-
-        <li class="header__navbar-item header__navbar-item--doc header__navbar-item--strong">Đăng ký</li>
-        <li class="header__navbar-item header__navbar-item--strong">Đăng nhập</li>
-      </ul>
-    </nav>
-  </div>
-</header>
+      </nav>
+    </div>
+  </header>
 
 
 
@@ -415,7 +422,7 @@
     <script type="text/javascript" src="https://web.cmbliss.com/webtools/hotline/js/hotline.js"></script>
     <script type="text/javascript">
         $("body").hotline({
-            phone: "0986822596",
+            phone: "0945720038",
             p_bottom: true,
             bottom: 0,
             p_left: true,
@@ -426,6 +433,8 @@
             position: "fixed",
         });
     </script>
+
+
 </body>
 
 </html>

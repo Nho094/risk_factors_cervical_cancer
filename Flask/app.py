@@ -1,4 +1,7 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+import datetime
+
+
 import numpy as np
 from sklearn.impute import SimpleImputer
 import pandas as pd
@@ -9,6 +12,7 @@ import os
 import requests
 import json
 from dotenv import load_dotenv
+
 load_dotenv()
 
 api_key = os.getenv("OPENROUTER_API_KEY")
@@ -25,11 +29,11 @@ def ask_openrouter(prompt):
     data = {
         # "model": "google/gemini-flash-2.5",
         #   "model":"cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-           "model":"google/gemma-3n-e2b-it:free",
-           "model":"cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+        #    "model":"google/gemma-3n-e2b-it:free",
+        #    "model":"cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
         # "model": "tngtech/deepseek-r1t2-chimera:free",
 
-        #   "model":"openrouter/cypher-alpha:free",
+          "model":"openrouter/cypher-alpha:free",
 
 
         "messages": [
@@ -227,8 +231,10 @@ def index():
                 "input": {k: request.form.get(k) for k in feature_names},
                 "result": int(prediction),
                 "proba": round(proba, 2),
-                "advice": advice
+                "advice": advice,
+                "timestamp": datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
             })
+
             session.modified = True
             return render_template("index.html", features=feature_names,
                                    result=prediction, proba=round(proba, 2),
@@ -251,19 +257,40 @@ def ask():
         return jsonify({"reply": reply})
     except Exception as e:
         return jsonify({"reply": f"Lỗi: {e}"})
-@app.route("/history")
-def history():
-    history_data = session.get("history", [])
-    return render_template("history.html", history=history_data, label_mapping=label_mapping)
+
 
 
 
 @app.route("/monitor")
 def monitor():
-    # Dữ liệu giả để test biểu đồ
-    labels = ["Lần 1", "Lần 2", "Lần 3", "Lần 4"]
-    probabilities = [18.5, 42.3, 26.7, 12.9]
+    predictions = session.get("history", [])
+    labels = [f"Lần {i+1}" for i in range(len(predictions))]
+    probabilities = [p.get("proba", 0) for p in predictions]
 
-    return render_template("monitor.html", labels=labels, probabilities=probabilities) 
+    # ✅ Truyền thêm timestamp và proba đầy đủ sang template
+    return render_template("monitor.html",
+                           labels=labels,
+                           probabilities=probabilities,
+                           history=predictions)
+
+
+
+@app.route("/predict", methods=["POST"])
+def predict():
+    return redirect(url_for("index"))
+
+
+@app.route('/history')
+def history():
+    history = session.get("history", [])
+    return render_template("history.html", history=history, label_mapping=label_mapping)
+
+
+@app.route("/clear_history")
+def clear_history():
+    session.pop("history", None)  # Xoá lịch sử người dùng hiện tại (trong session)
+    return redirect(url_for("monitor"))
+
+
 if __name__ == "__main__":
     app.run(debug=True)

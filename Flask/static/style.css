@@ -1,7 +1,7 @@
 
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: url('./images/AdobeStock_412295922_Preview.jpeg') no-repeat center center fixed;
+    background: url('./images/240_F_412295922_0BJF6UCeGoOAfValIjpNZwltXemwDOv3_LE_upscale_balanced_x4.jpg') no-repeat center center fixed;
     background-size: cover;
     color: #333;
     padding: 0px;
@@ -325,4 +325,19 @@ td:nth-child(2):has(:contains("Âm tính")) {
 
 .ai-message em {
     color: #555;
+}
+
+.modal{
+    position:fixed;
+    top: 0; 
+    right: 0; 
+    bottom: 0; 
+    left: 0;
+
+}
+.modal__overlay{
+    position:absolute;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 0.3);
 }

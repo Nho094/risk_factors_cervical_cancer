@@ -1,9 +1,9 @@
-
 .grid {
-    width: 80%;
-    max-width: 2500px;
+    width: 100%;  /* để các phần trăm bên trong đúng */
+    max-width: 2000px;
     margin: 0 auto;
 }
+
 
 .grid__full-width{
     width: 100%; 
@@ -19,11 +19,6 @@
     background: linear-gradient(to right, #182a60, #344a9f); /* trái sang phải */
 }
 
-.header__navbar {
-    display: flex;
-    align-items: center; /* Căn giữa chiều dọc */
-    justify-content: space-between;
-}
 
 /* Căn lại logo sát trái hơn, dùng % */
 .header__logo {
@@ -40,10 +35,51 @@
 }
 
 /* Đảm bảo logo và danh sách bên trái thẳng hàng */
-.header__navbar-left {
+
+.header__navbar {
     display: flex;
     align-items: center;
-    gap: 24px; /* tăng khoảng cách giữa logo và nav */
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+
+.header__navbar-left,
+.header__navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+
+.header__navbar-left {
+    flex: 1;
+    justify-content: flex-start;
+    padding-left: 1%;
+    gap: 16px;
+}
+
+.header__navbar-center {
+    flex: 2;
+    text-align: center;
+}
+
+.header__navbar-right {
+    flex: 1;
+    justify-content: flex-end;
+    padding-right: 1%;
+    gap: 16px;
+}
+
+
+.header__slogan {
+    font-family: 'Great Vibes', cursive;
+    font-size: 48px; /* 👈 Tăng từ 36px lên 42px */
+    font-weight: 400;
+    color: #fff;
+    margin: 0;
+    padding: 12px 0;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    white-space: nowrap;
 }
 
 /* Icon chỉnh cho đẹp */
@@ -149,3 +185,4 @@ footer a {
 .social-icons {
     margin: 10px 0;
 }
+
