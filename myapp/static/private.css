@@ -15,8 +15,11 @@
 
 
 .header {
-    height: 120px;
-    background: linear-gradient(to right, #182a60, #344a9f); /* trái sang phải */
+  width: 100%;
+  background: linear-gradient(to right, #182a60, #344a9f);
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 
