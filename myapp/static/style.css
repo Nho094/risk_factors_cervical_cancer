@@ -21,7 +21,8 @@ body {
 /* Container chính */
 .container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin-top: 140px; 
+    margin: 140px auto 0 auto;
     background: #ffffff;
     padding: 30px;
     border-radius: 10px;
@@ -86,7 +87,7 @@ button:hover {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 3000;
     left: 0;
     top: 0;
     width: 100%;
@@ -227,7 +228,7 @@ td:nth-child(2):has(:contains("Âm tính")) {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 2500;
 }
 
 #chatbox {
@@ -241,7 +242,7 @@ td:nth-child(2):has(:contains("Âm tính")) {
     border-radius: 12px;
     display: flex;
     flex-direction: column;
-    z-index: 999;
+    z-index: 2500;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     max-height: 80vh;
 }

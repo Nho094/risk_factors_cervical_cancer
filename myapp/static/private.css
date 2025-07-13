@@ -14,13 +14,7 @@
 }
 
 
-.header {
-  width: 100%;
-  background: linear-gradient(to right, #182a60, #344a9f);
-  padding: 20px;
-  box-sizing: border-box;
-  overflow: hidden;
-}
+
 
 
 /* Căn lại logo sát trái hơn, dùng % */
@@ -28,14 +22,12 @@
     display: flex;
     align-items: center;
     text-decoration: none;
-    margin-left: 1.5%; /* 👈 càng nhỏ càng sát */
+    margin-left: 1.5%;
+    margin-right: 24px;
 }
 
+
 /* Giảm kích thước để phù hợp nhiều màn hình */
-.header__logo-img {
-    height: 55px;
-    object-fit: contain;
-}
 
 /* Đảm bảo logo và danh sách bên trái thẳng hàng */
 
@@ -133,16 +125,12 @@
     cursor: pointer;
 }
 
-.header__logo{
-    display: flex; 
-    align-items: center;
-    text-decoration: none;
-    margin-right: 24px;
-}
-.header__logo-img{
-    height: 60px;
+
+.header__logo-img {
+    height: 55px; /* hoặc 60px tùy bạn chọn */
     object-fit: contain;
 }
+
 
 
 .wrapper {
@@ -152,12 +140,25 @@
 }
 
 /* Phần nội dung chính */
-.main-content {
-    flex: 1;
-    padding: 20px;
-    width: 100%;
-    box-sizing: border-box;
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: linear-gradient(to right, #182a60, #344a9f);
+  padding: 20px;
+  box-sizing: border-box;
 }
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  padding-top: 140px;  /* 👈 bù đúng chiều cao của header */
+  width: 100%;
+  box-sizing: border-box;
+}
+
 
 
 /* Footer styling giữ nguyên hoặc điều chỉnh lại */
@@ -204,7 +205,7 @@ footer a {
     text-align: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     display: none;
-    z-index: 1000;
+    z-index: 2000;
     width: 260px;
     border-radius: 8px;
 }
