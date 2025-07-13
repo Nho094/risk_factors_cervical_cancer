@@ -48,34 +48,25 @@ def ask_openrouter(prompt):
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://yourdomain.com",
-        "X-Title": "CervicalCancerPredictor"
+        "X-Title": "CervicalCancerPredictor"  # Tuỳ chọn
     }
 
-    data = {
-        # "model": "google/gemini-flash-2.5",
-        #   "model":"cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-        #    "model":"google/gemma-3n-e2b-it:free",
-        #    "model":"cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-        # "model": "tngtech/deepseek-r1t2-chimera:free",
-
-          "model":"openrouter/cypher-alpha:free",
-
-
-        "messages": [
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
+    payload = {
+        "model": "openrouter/cypher-alpha:free",  # Hoặc "mistralai/mixtral-8x7b"
+        "messages": [{"role": "user", "content": prompt}]
     }
 
-    response = requests.post(url=url, headers=headers, data=json.dumps(data))
-    
-    if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"]
-    else:
-        return f"Lỗi từ OpenRouter: {response.status_code} - {response.text}"
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=20)
+
+        if response.status_code == 200:
+            return response.json()["choices"][0]["message"]["content"]
+        else:
+            return f"❌ Lỗi API ({response.status_code}): {response.text}"
+    except requests.exceptions.Timeout:
+        return "❌ Lỗi: Quá thời gian phản hồi từ OpenRouter."
+    except Exception as e:
+        return f"❌ Lỗi: {str(e)}"
 
 
 from feature_advice import feature_advice  # Load mô tả
