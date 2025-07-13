@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 import threading  # 👈 THÊM ở đầu file (nếu chưa có)
 
 import sys
-sys.path.append("/opt/render/project/src")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 # ... các import khác như os, json, pandas...
