@@ -22,7 +22,13 @@
                 {% for item in history %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{ "🔴 Nguy cơ cao" if item.result == 1 else "🟢 Nguy cơ thấp" }}</td>
+                    <td>
+                        {% if item.proba >= 25 %}
+                            🔴 Nguy cơ cao ({{ item.proba }}%)
+                        {% else %}
+                            🟢 Nguy cơ thấp ({{ item.proba }}%)
+                        {% endif %}
+                    </td>
                     <td>{{ item.proba }}%</td>
                     <td>
                         <details>
