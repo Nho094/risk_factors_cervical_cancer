@@ -12,6 +12,10 @@ import json
 from dotenv import load_dotenv
 import threading  # 👈 THÊM ở đầu file (nếu chưa có)
 
+import sys
+sys.path.append("/opt/render/project/src")
+
+
 # ... các import khác như os, json, pandas...
 
 # ✅ Khai báo lock dùng cho thread-safe file write
@@ -342,4 +346,5 @@ def clear_history():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))  # fallback là 10000 nếu chạy local
+    app.run(host="0.0.0.0", port=port)
