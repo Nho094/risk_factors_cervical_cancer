@@ -249,10 +249,16 @@ def index():
 
             # Bước 6: SHAP plot
             
+            import os  # nếu chưa có ở đầu file
+
+# ...
             plt.figure()
+            os.makedirs("static", exist_ok=True)  # ✅ Đảm bảo thư mục 'static' tồn tại
+
             shap.plots.waterfall(shap_values[0], show=False)  # sử dụng matplotlib backend
             plt.savefig("static/shap_plot.png", bbox_inches='tight')
             plt.close()
+
             record = {
                 "input": {k: request.form.get(k) for k in feature_names},
                 "result": int(prediction),
@@ -260,6 +266,7 @@ def index():
                 "advice": advice,
                 "timestamp": datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
             }
+
 
             # Lưu tạm vào session (cho biểu đồ hoặc hiển thị lần này)
             if "history" not in session:
