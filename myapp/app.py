@@ -123,12 +123,22 @@ label_mapping = {
     "Citology": "Tế bào học dương tính",
     "Biopsy": "Sinh thiết dương tính"
 }
+
+
+
+ignored_columns = ["STDs: Time since first diagnosis", "STDs: Time since last diagnosis"]
+feature_names = [f for f in feature_names if f not in ignored_columns]
+
 # model = joblib.load("decision_tree_model.pkl")
-model = joblib.load("logistic_model.pkl")
-# model = joblib.load("random_forest_model.pkl")
+# model = joblib.load("logistic_model.pkl")
+model = joblib.load("random_forest_model.pkl")
 imputer = joblib.load("imputer.pkl")
-X_background = shap.maskers.Independent(pd.DataFrame([[0]*len(feature_names)], columns=feature_names))
-explainer = shap.LinearExplainer(model, masker=X_background, feature_names=feature_names)
+
+
+# Dùng TreeExplainer thay vì LinearExplainer
+explainer = shap.TreeExplainer(model)
+
+
 
 
 def generate_advice_auto(name, value, shap_val, percent):
@@ -243,10 +253,16 @@ def index():
             import os  # nếu chưa có ở đầu file
 
 # ...
-            plt.figure()
-            os.makedirs("static", exist_ok=True)  # ✅ Đảm bảo thư mục 'static' tồn tại
+            # Tính shap_values dạng mới
+            shap_values = explainer(X_input)
 
-            shap.plots.waterfall(shap_values[0], show=False)  # sử dụng matplotlib backend
+            # Đảm bảo thư mục 'static' tồn tại
+            os.makedirs("static", exist_ok=True)
+
+            # Dùng waterfall plot đúng cách (với SHAP v0.41+)
+            shap.plots.waterfall(shap_values[0], show=False)
+
+            # Lưu hình
             plt.savefig("static/shap_plot.png", bbox_inches='tight')
             plt.close()
 
