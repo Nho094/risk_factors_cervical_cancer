@@ -123,9 +123,9 @@ label_mapping = {
     "Citology": "Tế bào học dương tính",
     "Biopsy": "Sinh thiết dương tính"
 }
-
-
+# model = joblib.load("decision_tree_model.pkl")
 model = joblib.load("logistic_model.pkl")
+# model = joblib.load("random_forest_model.pkl")
 imputer = joblib.load("imputer.pkl")
 X_background = shap.maskers.Independent(pd.DataFrame([[0]*len(feature_names)], columns=feature_names))
 explainer = shap.LinearExplainer(model, masker=X_background, feature_names=feature_names)
