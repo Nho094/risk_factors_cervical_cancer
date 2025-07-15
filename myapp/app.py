@@ -1,27 +1,20 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import datetime
 import numpy as np
-from sklearn.impute import SimpleImputer
 import pandas as pd
 import joblib
-import shap
-import matplotlib.pyplot as plt
 import os
-import requests
 import json
 from dotenv import load_dotenv
-import threading  # 👈 THÊM ở đầu file (nếu chưa có)
-
+import threading
+import requests
+import shap 
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-
-# ... các import khác như os, json, pandas...
-
-# ✅ Khai báo lock dùng cho thread-safe file write
+# Lock thread-safe
 save_lock = threading.Lock()
 
-# ✅ Hàm lưu lịch sử có khóa an toàn
 def save_history_to_file(record):
     filename = "history_data.json"
     with save_lock:
@@ -35,12 +28,10 @@ def save_history_to_file(record):
             data = []
 
         data.append(record)
-
         with open(filename, "w") as f:
             json.dump(data, f, indent=2)
 
 load_dotenv()
-
 api_key = os.getenv("OPENROUTER_API_KEY")
 
 def ask_openrouter(prompt):
@@ -48,11 +39,11 @@ def ask_openrouter(prompt):
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "X-Title": "CervicalCancerPredictor"  # Tuỳ chọn
+        "X-Title": "CervicalCancerPredictor"
     }
 
     payload = {
-        "model": "openrouter/cypher-alpha:free",  # Hoặc "mistralai/mixtral-8x7b"
+        "model": "google/gemma-3n-e2b-it:free",  # hoặc "mistralai/mixtral-8x7b" nếu bạn muốn
         "messages": [{"role": "user", "content": prompt}]
     }
 
@@ -69,10 +60,10 @@ def ask_openrouter(prompt):
         return f"❌ Lỗi: {str(e)}"
 
 
-from feature_advice import feature_advice  # Load mô tả
+from feature_advice import feature_advice
 
 app = Flask(__name__)
-app.secret_key = "super-secret-key" 
+app.secret_key = "super-secret-key"
 
 feature_names = ['Age', 'Number of sexual partners', 'First sexual intercourse',
     'Num of pregnancies', 'Smokes', 'Smokes (years)', 'Smokes (packs/year)',
@@ -83,82 +74,103 @@ feature_names = ['Age', 'Number of sexual partners', 'First sexual intercourse',
     'STDs:pelvic inflammatory disease', 'STDs:genital herpes',
     'STDs:molluscum contagiosum', 'STDs:AIDS', 'STDs:HIV',
     'STDs:Hepatitis B', 'STDs:HPV', 'STDs: Number of diagnosis',
-    'STDs: Time since first diagnosis', 'STDs: Time since last diagnosis',
     'Dx:Cancer', 'Dx:CIN', 'Dx:HPV', 'Dx', 'Hinselmann', 'Schiller', 'Citology']
+
 label_mapping = {
-    "Age": "Tuổi",
-    "Number of sexual partners": "Số bạn tình",
-    "First sexual intercourse": "Tuổi quan hệ lần đầu",
-    "Num of pregnancies": "Số lần mang thai",
-    "Smokes": "Hút thuốc",
-    "Smokes (years)": "Số năm hút thuốc",
-    "Smokes (packs/year)": "Số gói mỗi năm",
-    "Hormonal Contraceptives": "Dùng thuốc tránh thai",
-    "Hormonal Contraceptives (years)": "Số năm dùng thuốc tránh thai",
-    "IUD": "Đặt vòng",
-    "IUD (years)": "Số năm đặt vòng",
-    "STDs": "Từng mắc STDs",
-    "STDs (number)": "Số lần mắc STDs",
-    "STDs:condylomatosis": "Sùi mào gà",
-    "STDs:cervical condylomatosis": "Sùi mào gà cổ tử cung",
-    "STDs:vaginal condylomatosis": "Sùi mào gà âm đạo",
-    "STDs:vulvo-perineal condylomatosis": "Sùi mào gà âm hộ - tầng sinh môn",
-    "STDs:syphilis": "Bệnh giang mai",
-    "STDs:pelvic inflammatory disease": "Viêm vùng chậu",
-    "STDs:genital herpes": "Mụn rộp sinh dục",
-    "STDs:molluscum contagiosum": "U mềm lây",
-    "STDs:AIDS": "AIDS",
-    "STDs:HIV": "HIV",
-    "STDs:Hepatitis B": "Viêm gan B",
-    "STDs:HPV": "Nhiễm HPV",
-    "STDs: Number of diagnosis": "Số lần được chẩn đoán STDs",
-    "STDs: Time since first diagnosis": "Thời gian từ lần chẩn đoán STDs đầu tiên",
-    "STDs: Time since last diagnosis": "Thời gian từ lần chẩn đoán STDs gần nhất",
-    "Dx:Cancer": "Chẩn đoán ung thư",
-    "Dx:CIN": "Chẩn đoán CIN",
-    "Dx:HPV": "Chẩn đoán HPV",
-    "Dx": "Chẩn đoán bất thường",
-    "Hinselmann": "Hinselmann dương tính",
-    "Schiller": "Schiller dương tính",
-    "Citology": "Tế bào học dương tính",
-    "Biopsy": "Sinh thiết dương tính"
+    "Age": "Tuổi", "Number of sexual partners": "Số bạn tình", "First sexual intercourse": "Tuổi quan hệ lần đầu",
+    "Num of pregnancies": "Số lần mang thai", "Smokes": "Hút thuốc", "Smokes (years)": "Số năm hút thuốc",
+    "Smokes (packs/year)": "Số gói mỗi năm", "Hormonal Contraceptives": "Dùng thuốc tránh thai",
+    "Hormonal Contraceptives (years)": "Số năm dùng thuốc tránh thai", "IUD": "Đặt vòng",
+    "IUD (years)": "Số năm đặt vòng", "STDs": "Từng mắc STDs", "STDs (number)": "Số lần mắc STDs",
+    "STDs:condylomatosis": "Sùi mào gà", "STDs:cervical condylomatosis": "Sùi mào gà cổ tử cung",
+    "STDs:vaginal condylomatosis": "Sùi mào gà âm đạo", "STDs:vulvo-perineal condylomatosis": "Sùi mào gà âm hộ - tầng sinh môn",
+    "STDs:syphilis": "Bệnh giang mai", "STDs:pelvic inflammatory disease": "Viêm vùng chậu",
+    "STDs:genital herpes": "Mụn rộp sinh dục", "STDs:molluscum contagiosum": "U mềm lây",
+    "STDs:AIDS": "AIDS", "STDs:HIV": "HIV", "STDs:Hepatitis B": "Viêm gan B", "STDs:HPV": "Nhiễm HPV",
+    "STDs: Number of diagnosis": "Số lần được chẩn đoán STDs", "Dx:Cancer": "Chẩn đoán ung thư",
+    "Dx:CIN": "Chẩn đoán CIN", "Dx:HPV": "Chẩn đoán HPV", "Dx": "Chẩn đoán bất thường",
+    "Hinselmann": "Hinselmann dương tính", "Schiller": "Schiller dương tính", "Citology": "Tế bào học dương tính"
 }
 
-
-
-ignored_columns = ["STDs: Time since first diagnosis", "STDs: Time since last diagnosis"]
-feature_names = [f for f in feature_names if f not in ignored_columns]
-
-# model = joblib.load("decision_tree_model.pkl")
-# model = joblib.load("logistic_model.pkl")
 model = joblib.load("random_forest_model.pkl")
-imputer = joblib.load("imputer.pkl")
+print("✅ Đã load mô hình:", type(model))
+explainer = shap.TreeExplainer(model)  # đặt ở ngoài
+# def generate_advice_simple(proba):
+#     if proba >= 25:
+#         return (
+#             "🔴 CẢNH BÁO: Có nguy cơ tiềm ẩn.\n\n"
+#             "💡 Khuyến nghị:\n"
+#             "• Tham khảo ý kiến bác sĩ chuyên khoa\n"
+#             "• Tiến hành xét nghiệm Pap smear hoặc HPV nếu chưa làm\n"
+#             "• Duy trì lối sống lành mạnh\n"
+#             "• Tránh thuốc lá, hạn chế rượu bia\n"
+#             "• Tiêm vaccine HPV nếu chưa tiêm\n"
+#             "❤️ Sức khỏe của bạn là điều quan trọng nhất."
+#         )
+#     else:
+#         return (
+#             "✅ Bạn hiện không có nguy cơ đáng kể.\n\n"
+#             "💡 Gợi ý:\n"
+#             "• Khám phụ khoa định kỳ\n"
+#             "• Duy trì lối sống lành mạnh\n"
+#             "• Tránh hút thuốc, hạn chế rượu bia\n"
+#             "• Tham khảo tiêm vaccine HPV nếu chưa tiêm\n"
+#             "❤️ Chúc bạn luôn khoẻ mạnh."
+#         )
 
+# @app.route("/", methods=["GET", "POST"])
+# def index():
+#     if request.method == "POST":
+#         try:
+#             input_dict = dict.fromkeys(feature_names, np.nan)
+#             for name in feature_names:
+#                 raw_val = request.form.get(name)
+#                 try:
+#                     input_dict[name] = float(raw_val)
+#                 except (TypeError, ValueError):
+#                     pass
 
-# Dùng TreeExplainer thay vì LinearExplainer
-explainer = shap.TreeExplainer(model)
+#             # Nếu tất cả đều rỗng
+#             if pd.DataFrame([input_dict]).isna().all(axis=1).values[0]:
+#                 return "⚠️ Vui lòng nhập ít nhất một giá trị vào biểu mẫu."
 
+#             X_input = pd.DataFrame([input_dict], columns=feature_names).fillna(0)
+#             X_input = X_input[model.feature_names_in_]
 
+#             prediction = model.predict(X_input)[0]
+#             proba = model.predict_proba(X_input)[0][1] * 100
+#             advice = generate_advice_simple(proba)
 
+#             # ✅ Tạo extra_insight từ input và feature_advice
+#             extra_insight = ""
+#             for name in feature_names:
+#                 val = input_dict[name]
+#                 if val and name in feature_advice:
+#                     vi_name = label_mapping.get(name, name)
+#                     desc = feature_advice[name].get("desc", "")
+#                     action = feature_advice[name].get("action", "")
+#                     extra_insight += f"• {vi_name} = {val}\n  {desc}\n  👉 {action}\n\n"
 
-def generate_advice_auto(name, value, shap_val, percent):
-    
-    if shap_val <= 0:
-        return ""  # Bỏ qua nếu đặc trưng làm giảm nguy cơ
-    trend = "tăng nguy cơ" 
-    vi_name = label_mapping.get(name, name)
-    line = f"• {vi_name} = {value} → {trend} ({shap_val:+.2f}, ảnh hưởng: {percent:.1f}%)\n"
+#             record = {
+#                 "input": {k: request.form.get(k) for k in feature_names},
+#                 "result": int(prediction),
+#                 "proba": round(proba, 2),
+#                 "advice": advice,
+#                 "timestamp": datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
+#             }
 
+#             if "history" not in session:
+#                 session["history"] = []
+#             session["history"].append(record)
+#             session.modified = True
+#             save_history_to_file(record)
 
-    if name in feature_advice:
-        desc = feature_advice[name]["desc"]
-        action = feature_advice[name]["action"]
-    else:
-        desc = f"Yếu tố này ảnh hưởng {trend} đến nguy cơ mắc bệnh."
-        action = "Nên tham khảo ý kiến bác sĩ nếu bạn chưa rõ về yếu tố này."
-
-    return f"{line}  {desc}\n  👉 {action}\n"
-
+#             return render_template("index.html", features=feature_names,
+#                                    result=prediction, proba=round(proba, 2),
+#                                    advice=advice, extra_insight=extra_insight)
+#         except Exception as e:
+#             return f"Lỗi xử lý dữ liệu: {e}"
+#     return render_template("index.html", features=feature_names, result=None)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -166,106 +178,69 @@ def index():
     if request.method == "POST":
         try:
             input_dict = dict.fromkeys(feature_names, np.nan)
-
-            # Ghi đè bằng các giá trị người dùng đã nhập
             for name in feature_names:
                 raw_val = request.form.get(name)
                 try:
                     input_dict[name] = float(raw_val)
                 except (TypeError, ValueError):
-                    pass  # giữ nguyên np.nan nếu không thể chuyển
+                    pass
 
-            # Kiểm tra: nếu mọi giá trị đều là NaN → trả lỗi nhẹ nhàng
-            if all(np.isnan(v) for v in input_dict.values()):
+            if pd.DataFrame([input_dict]).isna().all(axis=1).values[0]:
                 return "⚠️ Vui lòng nhập ít nhất một giá trị vào biểu mẫu."
 
-            # Dựng DataFrame với đủ cột
-            X_input = pd.DataFrame([input_dict], columns=feature_names)
-
-            # Kiểm tra số lượng cột có giá trị thực
-            valid_cols = X_input.notna().sum().sum()
-            if valid_cols == 0:
-                return "⚠️ Không thể xử lý vì tất cả các giá trị đều trống."
-
-            # Áp dụng Imputer nếu hợp lệ
-            
-            X_input = pd.DataFrame(imputer.transform(X_input), columns=feature_names)
-
-
-            # Bước 3: Dự đoán
+            # Dự đoán
+            X_input = pd.DataFrame([input_dict], columns=feature_names).fillna(0)
+            X_input = X_input[model.feature_names_in_]
             prediction = model.predict(X_input)[0]
             proba = model.predict_proba(X_input)[0][1] * 100
 
-            # Bước 4: SHAP
-            shap_values = explainer(X_input)
-            shap_score = shap_values.values[0]
-            total_abs = sum(abs(val) for val in shap_score)
-
-            impacts = [
-                (feature_names[i], shap_score[i], abs(shap_score[i]) / total_abs * 100)
-                for i in range(len(feature_names))
-            ]
-            impacts_sorted = sorted(impacts, key=lambda x: abs(x[1]), reverse=True)
-            filtered = [x for x in impacts_sorted if x[2] >= 5]
-            if not filtered:
-                filtered = impacts_sorted[:3]
-
-            # Bước 5: Sinh lời khuyên
+            # Sinh lời khuyên chính
             if proba >= 25:
-                advice = "🔴 CẢNH BÁO: Có nguy cơ tiềm ẩn.\n\n"
-
-                has_high_impact = any(pct > 25 for _, _, pct in filtered)
-
-                for name, shap_val, percent in filtered:
-                    val = X_input.iloc[0][name]
-                    advice += generate_advice_auto(name, val, shap_val, percent)
-
-                if has_high_impact:
-                    advice = (
-                        "⚠️ Một số yếu tố có ảnh hưởng rất lớn đến kết quả (trên 25%). "
-                        "Bạn nên tham khảo ý kiến bác sĩ sớm.\n\n"
-                    ) + advice
-
-                advice += (
-                    "\n💡 Khuyến nghị:\n"
+                advice = (
+                    "🔴 CẢNH BÁO: Có nguy cơ tiềm ẩn.\n\n"
+                    "💡 Khuyến nghị:\n"
                     "• Tham khảo ý kiến bác sĩ chuyên khoa\n"
                     "• Tiến hành xét nghiệm Pap smear hoặc HPV nếu chưa làm\n"
-                    "• Duy trì lối sống lành mạnh, ăn uống khoa học\n"
-                    "• Tuyệt đối tránh thuốc lá, hạn chế rượu bia\n"
+                    "• Duy trì lối sống lành mạnh\n"
+                    "• Tránh thuốc lá, hạn chế rượu bia\n"
                     "• Tiêm vaccine HPV nếu chưa tiêm\n"
-                    "\nSức khỏe của bạn là điều quan trọng nhất. Hãy hành động ngay hôm nay! ❤️"
+                    "❤️ Sức khỏe của bạn là điều quan trọng nhất."
                 )
             else:
                 advice = (
                     "✅ Bạn hiện không có nguy cơ đáng kể.\n\n"
-                    "💡 Tuy nhiên, hãy:\n"
+                    "💡 Gợi ý:\n"
+                    "• Khám phụ khoa định kỳ\n"
                     "• Duy trì lối sống lành mạnh\n"
-                    "• Khám phụ khoa định kỳ (ít nhất mỗi 6–12 tháng)\n"
                     "• Tránh hút thuốc, hạn chế rượu bia\n"
-                    "• Nếu chưa tiêm vaccine HPV, nên tham khảo ý kiến bác sĩ về việc tiêm phòng\n"
-                    "\nChúc bạn luôn khỏe mạnh ❤️"
+                    "• Tham khảo tiêm vaccine HPV nếu chưa tiêm\n"
+                    "❤️ Chúc bạn luôn khoẻ mạnh."
                 )
 
-            extra_insight = ask_openrouter(f"Hãy đưa ra phân tích y khoa bằng tiếng Việt dựa trên lời khuyên sau:\n{advice}")
+            # Phân tích từ các đặc trưng nguy cơ (dựa trên threshold)
+            extra_insight = ""
+            for name in feature_names:
+                val = input_dict[name]
+                if pd.notna(val) and name in feature_advice:
+                    threshold = feature_advice[name].get("threshold", 0)
+                    if val >= threshold:
+                        vi_name = label_mapping.get(name, name)
+                        desc = feature_advice[name].get("desc", "")
+                        action = feature_advice[name].get("action", "")
+                        extra_insight += f"• {vi_name} = {val}\n  {desc}\n  👉 {action}\n\n"
+                    elif "desc_low" in feature_advice[name]:
+                        vi_name = label_mapping.get(name, name)
+                        desc = feature_advice[name].get("desc_low", "")
+                        action = feature_advice[name].get("action_low", "")
+                        extra_insight += f"• {vi_name} = {val}\n  {desc}\n  👉 {action}\n\n"
 
-            # Bước 6: SHAP plot
-            
-            import os  # nếu chưa có ở đầu file
+            # Phân tích bổ sung từ OpenRouter (nếu cần)
+            try:
+                extra_ai = ask_openrouter(f"Hãy phân tích lời khuyên y khoa sau bằng tiếng Việt:\n{advice}")
+            except:
+                extra_ai = ""
 
-# ...
-            # Tính shap_values dạng mới
-            shap_values = explainer(X_input)
-
-            # Đảm bảo thư mục 'static' tồn tại
-            os.makedirs("static", exist_ok=True)
-
-            # Dùng waterfall plot đúng cách (với SHAP v0.41+)
-            shap.plots.waterfall(shap_values[0], show=False)
-
-            # Lưu hình
-            plt.savefig("static/shap_plot.png", bbox_inches='tight')
-            plt.close()
-
+            # Lưu lịch sử
             record = {
                 "input": {k: request.form.get(k) for k in feature_names},
                 "result": int(prediction),
@@ -274,26 +249,23 @@ def index():
                 "timestamp": datetime.datetime.now().strftime("%d-%m-%Y %H:%M")
             }
 
-
-            # Lưu tạm vào session (cho biểu đồ hoặc hiển thị lần này)
             if "history" not in session:
                 session["history"] = []
             session["history"].append(record)
             session.modified = True
-
-            # Lưu vĩnh viễn vào file JSON
             save_history_to_file(record)
 
-            return render_template("index.html", features=feature_names,
-                                result=prediction, proba=round(proba, 2),
-                                advice=advice, extra_insight=extra_insight)
-
-
-
+            return render_template("index.html",
+                                   features=feature_names,
+                                   result=prediction,
+                                   proba=round(proba, 2),
+                                   advice=advice,
+                                   extra_insight=extra_insight + extra_ai)
         except Exception as e:
             return f"Lỗi xử lý dữ liệu: {e}"
+
     return render_template("index.html", features=feature_names, result=None)
-from flask import jsonify  
+
 
 @app.route("/ask", methods=["POST"])
 def ask():
@@ -308,31 +280,28 @@ def ask():
         return jsonify({"reply": f"Lỗi: {e}"})
 
 
-
-
 @app.route("/monitor")
 def monitor():
     try:
         with open("history_data.json", "r") as f:
-            predictions = json.load(f)
+            history = json.load(f)
     except FileNotFoundError:
-        predictions = []
+        history = []
 
-    labels = [f"Lần {i+1}" for i in range(len(predictions))]
-    probabilities = [p.get("proba", 0) for p in predictions]
+    # Lấy nhãn thời gian và xác suất tương ứng
+    labels = [entry.get("timestamp", f"Lần {i+1}") for i, entry in enumerate(history)]
+    probabilities = [entry.get("proba", 0) for entry in history]
 
     return render_template("monitor.html",
                            labels=labels,
                            probabilities=probabilities,
-                           history=predictions)
-
+                           history=history)
 
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
     return redirect(url_for("index"))
-
 
 @app.route('/history')
 def history():
@@ -341,24 +310,15 @@ def history():
             history = json.load(f)
     except FileNotFoundError:
         history = []
-
     return render_template("history.html", history=history, label_mapping=label_mapping)
-
-
 
 @app.route("/clear_history")
 def clear_history():
-    # Xoá session
     session.pop("history", None)
-
-    # Xoá file JSON nếu tồn tại
     if os.path.exists("history_data.json"):
         os.remove("history_data.json")
-
     return redirect(url_for("monitor"))
 
-
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # fallback là 10000 nếu chạy local
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
