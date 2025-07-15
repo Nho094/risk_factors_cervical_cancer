@@ -12,10 +12,12 @@ feature_advice = {
         "action_low": "Tiếp tục duy trì lối sống tình dục an toàn."
     },
     "First sexual intercourse": {
-        "desc": "Quan hệ tình dục sớm làm tăng nguy cơ phơi nhiễm với HPV.",
-        "action": "Giáo dục tình dục an toàn và tiêm vaccine HPV.",
-        "threshold": 17
+    "desc": "Quan hệ tình dục sớm làm tăng nguy cơ phơi nhiễm với HPV.",
+    "action": "Giáo dục tình dục an toàn và tiêm vaccine HPV.",
+    "threshold": 17,
+    "direction": "low"  # 👈 thêm dòng này
     },
+
     "Num of pregnancies": {
         "desc": "Mang thai nhiều lần có thể làm thay đổi nội tiết và tăng nguy cơ.",
         "action": "Theo dõi sức khỏe phụ khoa sau sinh.",
